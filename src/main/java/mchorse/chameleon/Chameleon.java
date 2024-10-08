@@ -10,13 +10,13 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod(modid = Chameleon.MOD_ID, name = Chameleon.MODNAME, version = Chameleon.VERSION, dependencies = "required-after:mclib@[%MCLIB%,);required-after:metamorph@[%METAMORPH%,)", updateJSON = "https://raw.githubusercontent.com/mchorse/chameleon/master/version.json")
+@Mod(modid = Chameleon.MOD_ID, name = Chameleon.MODNAME, version = Chameleon.VERSION, dependencies = "required-after:mclib@[2.4.3,);required-after:metamorph@[1.4,)", updateJSON = "https://raw.githubusercontent.com/mchorse/chameleon/master/version.json")
 public class Chameleon
 {
     /* Sadly "chameleon" mod ID conflicts with another popular mod... */
     public static final String MOD_ID = "chameleon_morph";
     public static final String MODNAME = "Chameleon";
-    public static final String VERSION = "%VERSION%";
+    public static final String VERSION = "1.2.2";
 
     @SidedProxy(serverSide = "mchorse.chameleon.CommonProxy", clientSide = "mchorse.chameleon.ClientProxy")
     public static CommonProxy proxy;
