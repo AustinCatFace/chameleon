@@ -20,7 +20,7 @@ if (project.hasProperty("dev"))
 }
 
 group = "mchorse.chameleon"
-archivesBaseName = "chameleon"
+archivesBaseName = "chameleon-cf"
 
 sourceCompatibility = targetCompatibility = '1.8'
 
@@ -67,7 +67,7 @@ dependencies
 {
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2859'
     compile files("mclib-2.4.3-1.12.2.jar")
-    compile files("metamorph-1.4.jar")
+    compile files("metamorph-cf-1.5.jar")
 }
 
 //processResources

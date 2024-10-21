@@ -1,5 +1,6 @@
 package mchorse.chameleon.metamorph;
 
+import mchorse.chameleon.Chameleon;
 import mchorse.chameleon.ClientProxy;
 import mchorse.chameleon.animation.ActionPlayback;
 import mchorse.chameleon.animation.ActionsConfig;
@@ -26,8 +27,10 @@ import mchorse.metamorph.api.morphs.utils.ISyncableMorph;
 import mchorse.metamorph.bodypart.BodyPart;
 import mchorse.metamorph.bodypart.BodyPartManager;
 import mchorse.metamorph.bodypart.IBodyPartProvider;
+import mchorse.metamorph.capabilities.morphing.Morphing;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -244,6 +247,11 @@ public class ChameleonMorph extends AbstractMorph implements IBodyPartProvider, 
 
         this.renderModel(target, partialTicks);
 
+
+        if(getSettings().glowing){
+            this.renderGlowingModel(target, partialTicks);
+        }
+
         if (captured)
         {
             MatrixUtils.releaseMatrix();
@@ -310,6 +318,75 @@ public class ChameleonMorph extends AbstractMorph implements IBodyPartProvider, 
 
             GlStateManager.popMatrix();
         }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void renderGlowingModel(EntityLivingBase target, float partialTicks)
+    {
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.enableAlpha();
+
+        ChameleonModel chameleonModel = this.getModel();
+
+        if (chameleonModel == null)
+        {
+            return;
+        }
+
+        this.checkAnimator();
+
+        Model model = chameleonModel.model;
+
+        ChameleonAnimator.resetPose(model);
+
+        if (!chameleonModel.isStatic())
+        {
+            this.getAnimator().applyActions(target, model, partialTicks);
+        }
+
+        this.applyPose(model, partialTicks);
+
+        ResourceLocation glowSkin = getGlowSkin(this.skin);
+
+        /* Render the model */
+        if (glowSkin != null)
+        {
+            Minecraft.getMinecraft().renderEngine.bindTexture(glowSkin);
+        }
+
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240f, 240f);
+
+        ChameleonRenderer.render(model);
+
+        RenderLightmap.unset();
+
+        /* Render body parts */
+        GlStateManager.color(1, 1, 1);
+
+        this.parts.initBodyParts();
+
+        for (BodyPart part : this.parts.parts)
+        {
+            GlStateManager.pushMatrix();
+
+            if (ChameleonRenderer.postRender(model, part.limb))
+            {
+                part.render(this, target, partialTicks);
+            }
+
+            GlStateManager.popMatrix();
+        }
+    }
+
+    private ResourceLocation getGlowSkin(ResourceLocation rl){
+        String path = rl.toString();
+        if(path.contains(".png")){
+           path = path.replace(".png","_glowing.png");
+        } else {
+            path = path+"_glowing";
+        }
+        return new ResourceLocation(path);
     }
 
     @SideOnly(Side.CLIENT)
